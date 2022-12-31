@@ -2,6 +2,7 @@ import {
   ActionArgs,
   json,
   LoaderArgs,
+  MetaFunction,
   NodeOnDiskFile,
   unstable_parseMultipartFormData,
 } from "@remix-run/node";
@@ -32,7 +33,12 @@ import { NewKeyForm } from "~/components/NewKeyForm";
 import { createKey, getKeys } from "~/models/key.server";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { Viewer } from "~/components/Viewer";
-import { ac } from "vitest/dist/global-58e8e951";
+
+export const meta: MetaFunction = () => {
+  return {
+    title: "Admin",
+  };
+};
 
 export async function loader({ request }: LoaderArgs) {
   await requireUserId(request);
