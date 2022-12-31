@@ -248,7 +248,7 @@ export async function action({ request }: ActionArgs) {
     case "create_key": {
       const trees = formData.getAll("tree");
       const name = formData.get("name");
-      await createKey(name as string, trees);
+      await createKey(name as string, trees as string[]);
       return json({
         success: {
           create: false,
@@ -308,7 +308,7 @@ export async function action({ request }: ActionArgs) {
           promisedUploads.push(uploadFile());
         }
         await Promise.all(promisedUploads);
-        await updateVersion(id, version.toString());
+        await updateVersion(id as string, version.toString());
       }
       if (doc?.name) {
         const docFile = await fs.readFileSync(`./tmp/uploads/${doc?.name}`);
