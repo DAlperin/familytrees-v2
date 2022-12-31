@@ -248,7 +248,7 @@ export async function action({ request }: ActionArgs) {
     case "create_key": {
       const trees = formData.getAll("tree");
       const name = formData.get("name");
-      await createKey(name, trees);
+      await createKey(name as string, trees);
       return json({
         success: {
           create: false,
@@ -319,7 +319,7 @@ export async function action({ request }: ActionArgs) {
           ACL: "public-read",
         };
         await s3Client.send(new PutObjectCommand(docUploadParams));
-        await updateDocVersion(id, doc.name);
+        await updateDocVersion(id as string, doc?.name);
       }
       return json({
         success: {

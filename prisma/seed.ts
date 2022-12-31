@@ -23,32 +23,6 @@ async function seed() {
       },
     },
   });
-  const tree = await prisma.tree.upsert({
-    where: {
-      name: "exampletree1",
-    },
-    update: {
-      name: "exampletree1",
-      version: "v1",
-    },
-    create: {
-      name: "exampletree1",
-      version: "v1",
-    },
-  });
-  const tree2 = await prisma.tree.upsert({
-    where: {
-      name: "exampletree2",
-    },
-    update: {
-      name: "exampletree2",
-      version: "v1",
-    },
-    create: {
-      name: "exampletree2",
-      version: "v1",
-    },
-  });
   // const key = await prisma.key.create({
   //   data: {
   //     trees: {
