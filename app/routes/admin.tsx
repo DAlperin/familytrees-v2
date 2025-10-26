@@ -254,18 +254,73 @@ export async function action({ request }: ActionArgs) {
     case "create_key": {
       const trees = formData.getAll("tree");
       const name = formData.get("name");
-      await createKey(name as string, trees as string[]);
-      return json({
-        success: {
-          create: false,
-          update: false,
-          key: true,
-        },
-        errors: {
-          name: null,
-          image: null,
-        },
-      });
+
+      // Validate name
+      if (!name || typeof name !== "string" || name.trim().length === 0) {
+        return json(
+          {
+            success: {
+              create: false,
+              update: false,
+              key: false,
+            },
+            errors: {
+              name: "Name is required",
+              image: null,
+            },
+          },
+          { status: 400 }
+        );
+      }
+
+      // Validate that at least one tree is selected
+      if (!trees || trees.length === 0) {
+        return json(
+          {
+            success: {
+              create: false,
+              update: false,
+              key: false,
+            },
+            errors: {
+              name: null,
+              image: "At least one tree must be selected",
+            },
+          },
+          { status: 400 }
+        );
+      }
+
+      try {
+        await createKey(name, trees as string[]);
+        return json({
+          success: {
+            create: false,
+            update: false,
+            key: true,
+          },
+          errors: {
+            name: null,
+            image: null,
+          },
+        });
+      } catch (e) {
+        console.error("Error creating key:", e);
+        return json(
+          {
+            success: {
+              create: false,
+              update: false,
+              key: false,
+            },
+            errors: {
+              name: null,
+              image: "Failed to create key. Please try again.",
+            },
+          },
+          { status: 500 }
+        );
+      }
     }
     case "update_tree": {
       const id = formData.get("id");
@@ -431,7 +486,18 @@ export default function Admin() {
           </>
         ) : null}
         {openMenu === "createKey" ? (
-          <NewKeyForm formRef={keyFormRef} trees={loaderData.trees} />
+          <>
+            <NewKeyForm formRef={keyFormRef} trees={loaderData.trees} />
+            {actionData?.errors?.name ? (
+              <p className="text-red-600">{actionData?.errors?.name}</p>
+            ) : null}
+            {actionData?.errors?.image ? (
+              <p className="text-red-600">{actionData?.errors?.image}</p>
+            ) : null}
+            {actionData?.success?.key ? (
+              <p className="text-green-600">Key created successfully!</p>
+            ) : null}
+          </>
         ) : null}
         {openMenu === "showTrees" ? (
           <>
