@@ -17,6 +17,12 @@ type Pages = {
   "/admin": {
     params: {};
   };
+  "/admin/trees": {
+    params: {};
+  };
+  "/admin/keys": {
+    params: {};
+  };
   "/login": {
     params: {};
   };
@@ -39,7 +45,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/admin" | "/login" | "/join" | "/logout" | "/healthcheck" | "/:key";
+    page: "/" | "/admin" | "/admin/trees" | "/admin/keys" | "/login" | "/join" | "/logout" | "/healthcheck" | "/:key";
   };
   "./routes/index.tsx": {
     id: "routes/index";
@@ -47,7 +53,19 @@ type RouteFiles = {
   };
   "./routes/admin.tsx": {
     id: "routes/admin";
+    page: "/admin" | "/admin/trees" | "/admin/keys";
+  };
+  "./routes/admin/index.tsx": {
+    id: "routes/admin/index";
     page: "/admin";
+  };
+  "./routes/admin/trees.tsx": {
+    id: "routes/admin/trees";
+    page: "/admin/trees";
+  };
+  "./routes/admin/keys.tsx": {
+    id: "routes/admin/keys";
+    page: "/admin/keys";
   };
   "./routes/login.tsx": {
     id: "routes/login";
@@ -75,6 +93,9 @@ type RouteModules = {
   "root": typeof import("./app/root.tsx");
   "routes/index": typeof import("./app/./routes/index.tsx");
   "routes/admin": typeof import("./app/./routes/admin.tsx");
+  "routes/admin/index": typeof import("./app/./routes/admin/index.tsx");
+  "routes/admin/trees": typeof import("./app/./routes/admin/trees.tsx");
+  "routes/admin/keys": typeof import("./app/./routes/admin/keys.tsx");
   "routes/login": typeof import("./app/./routes/login.tsx");
   "routes/join": typeof import("./app/./routes/join.tsx");
   "routes/logout": typeof import("./app/./routes/logout.tsx");

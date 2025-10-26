@@ -41,3 +41,11 @@ export async function getKeys() {
     },
   });
 }
+
+export async function deleteKey(id: string) {
+  return await prisma.accessKey.delete({
+    where: {
+      id,
+    },
+  });
+}
