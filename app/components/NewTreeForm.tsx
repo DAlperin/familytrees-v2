@@ -1,4 +1,4 @@
-import { Form, useTransition } from "@remix-run/react";
+import { Form, useNavigation } from "react-router";
 import { RefObject } from "react";
 
 export function NewTreeForm({
@@ -6,7 +6,7 @@ export function NewTreeForm({
 }: {
   formRef: RefObject<HTMLFormElement>;
 }) {
-  const transition = useTransition();
+  const navigation = useNavigation();
   return (
     <Form
       method="post"
@@ -62,7 +62,7 @@ export function NewTreeForm({
           value="create"
           className="flex w-1/2 justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
         >
-          {transition.submission ? "Processing upload..." : "Create"}
+          {navigation.state === "submitting" ? "Processing upload..." : "Create"}
         </button>
       </div>
     </Form>

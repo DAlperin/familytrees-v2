@@ -1,9 +1,9 @@
-import { LoaderArgs } from "@remix-run/node";
+import { LoaderFunctionArgs } from "react-router";
 import { prisma } from "~/db.server";
-import { useLoaderData } from "@remix-run/react";
+import { useLoaderData } from "react-router";
 import { Viewer } from "~/components/Viewer";
 
-export const loader = async ({ params }: LoaderArgs) => {
+export const loader = async ({ params }: LoaderFunctionArgs) => {
   const key = await prisma.accessKey.findFirst({
     where: {
       id: params.key,

@@ -1,21 +1,18 @@
 import {
-  ActionArgs,
-  json,
-  LoaderArgs,
-  MetaFunction,
-  NodeOnDiskFile,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+  type MetaFunction,
+  data,
+} from "react-router";
+import {
   unstable_parseMultipartFormData,
+  type NodeOnDiskFile,
 } from "@remix-run/node";
 import { requireUserId } from "~/session.server";
 import { NewTreeForm } from "~/components/NewTreeForm";
 import { useEffect, useRef, useState } from "react";
 import { rmSync, uploadHandler } from "~/uploadHandler.server";
-import {
-  Form,
-  useActionData,
-  useFetcher,
-  useLoaderData,
-} from "@remix-run/react";
+import { Form, useActionData, useFetcher, useLoaderData } from "react-router";
 import { tileImage } from "~/sharp.server";
 import type { PutObjectCommandInput } from "@aws-sdk/client-s3";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
@@ -35,12 +32,10 @@ import { PrismaClientKnownRequestError } from "@prisma/client/runtime";
 import { Viewer } from "~/components/Viewer";
 
 export const meta: MetaFunction = () => {
-  return {
-    title: "Admin",
-  };
+  return [{ title: "Admin" }];
 };
 
-export async function loader({ request }: LoaderArgs) {
+export async function loader({ request }: LoaderFunctionArgs) {
   await requireUserId(request);
   const trees = await getTrees();
   const keys = await getKeys();
@@ -55,7 +50,7 @@ export async function loader({ request }: LoaderArgs) {
   };
 }
 
-export async function action({ request }: ActionArgs) {
+export async function action({ request }: ActionFunctionArgs) {
   const formData = await unstable_parseMultipartFormData(
     request,
     uploadHandler
@@ -72,68 +67,56 @@ export async function action({ request }: ActionArgs) {
         : null;
 
       if (typeof name !== "string") {
-        return json(
-          {
-            success: {
-              create: false,
-              update: false,
-              key: false,
-            },
-            errors: {
-              name: "Invalid name",
-              image: null,
-            },
+        return {
+          success: {
+            create: false,
+            update: false,
+            key: false,
           },
-          { status: 400 }
-        );
+          errors: {
+            name: "Invalid name",
+            image: null,
+          },
+        };
       }
       if (name.length < 5) {
-        return json(
-          {
-            success: {
-              create: false,
-              update: false,
-              key: false,
-            },
-            errors: {
-              name: "Name must be at least 5 chars",
-              image: null,
-            },
+        return {
+          success: {
+            create: false,
+            update: false,
+            key: false,
           },
-          { status: 400 }
-        );
+          errors: {
+            name: "Name must be at least 5 chars",
+            image: null,
+          },
+        };
       }
       if (!image?.name) {
-        return json(
-          {
-            success: {
-              create: false,
-              update: false,
-              key: false,
-            },
-            errors: {
-              name: null,
-              image: "image required",
-            },
+        return {
+          success: {
+            create: false,
+            update: false,
+            key: false,
           },
-          { status: 400 }
-        );
+          errors: {
+            name: null,
+            image: "image required",
+          },
+        };
       }
       if (!doc?.name) {
-        return json(
-          {
-            success: {
-              create: false,
-              update: false,
-              key: false,
-            },
-            errors: {
-              name: null,
-              image: "document required",
-            },
+        return {
+          success: {
+            create: false,
+            update: false,
+            key: false,
           },
-          { status: 400 }
-        );
+          errors: {
+            name: null,
+            image: "document required",
+          },
+        };
       }
       const docVersion = doc?.name;
       let promisedUploads = [];
@@ -191,7 +174,7 @@ export async function action({ request }: ActionArgs) {
         console.log(e);
         if (e instanceof PrismaClientKnownRequestError) {
           if (e.code === "P2002") {
-            return json({
+            return {
               success: {
                 create: false,
                 update: false,
@@ -201,13 +184,13 @@ export async function action({ request }: ActionArgs) {
                 name: "Name already taken, pick a new one",
                 image: null,
               },
-            });
+            };
           }
         }
       }
       rmSync(`./tmp/out/${version}.dzi`);
       rmSync(`./tmp/out/${version}_files`, { recursive: true, force: true });
-      return json({
+      return {
         success: {
           create: true,
           update: false,
@@ -217,29 +200,26 @@ export async function action({ request }: ActionArgs) {
           name: null,
           image: null,
         },
-      });
+      };
     }
     case "delete_tree": {
       const id = formData.get("id");
       if (typeof id !== "string") {
-        return json(
-          {
-            success: {
-              create: false,
-              update: false,
-              key: false,
-            },
-            errors: {
-              name: null,
-              image: null,
-              delete: "bad",
-            },
+        return {
+          success: {
+            create: false,
+            update: false,
+            key: false,
           },
-          { status: 400 }
-        );
+          errors: {
+            name: null,
+            image: null,
+            delete: "bad",
+          },
+        };
       }
       await deleteTree(id);
-      return json({
+      return {
         success: {
           create: false,
           update: false,
@@ -249,7 +229,7 @@ export async function action({ request }: ActionArgs) {
           name: null,
           image: null,
         },
-      });
+      };
     }
     case "create_key": {
       const trees = formData.getAll("tree");
@@ -257,43 +237,37 @@ export async function action({ request }: ActionArgs) {
 
       // Validate name
       if (!name || typeof name !== "string" || name.trim().length === 0) {
-        return json(
-          {
-            success: {
-              create: false,
-              update: false,
-              key: false,
-            },
-            errors: {
-              name: "Name is required",
-              image: null,
-            },
+        return {
+          success: {
+            create: false,
+            update: false,
+            key: false,
           },
-          { status: 400 }
-        );
+          errors: {
+            name: "Name is required",
+            image: null,
+          },
+        };
       }
 
       // Validate that at least one tree is selected
       if (!trees || trees.length === 0) {
-        return json(
-          {
-            success: {
-              create: false,
-              update: false,
-              key: false,
-            },
-            errors: {
-              name: null,
-              image: "At least one tree must be selected",
-            },
+        return {
+          success: {
+            create: false,
+            update: false,
+            key: false,
           },
-          { status: 400 }
-        );
+          errors: {
+            name: null,
+            image: "At least one tree must be selected",
+          },
+        };
       }
 
       try {
         await createKey(name, trees as string[]);
-        return json({
+        return {
           success: {
             create: false,
             update: false,
@@ -303,23 +277,20 @@ export async function action({ request }: ActionArgs) {
             name: null,
             image: null,
           },
-        });
+        };
       } catch (e) {
         console.error("Error creating key:", e);
-        return json(
-          {
-            success: {
-              create: false,
-              update: false,
-              key: false,
-            },
-            errors: {
-              name: null,
-              image: "Failed to create key. Please try again.",
-            },
+        return {
+          success: {
+            create: false,
+            update: false,
+            key: false,
           },
-          { status: 500 }
-        );
+          errors: {
+            name: null,
+            image: "Failed to create key. Please try again.",
+          },
+        };
       }
     }
     case "update_tree": {
@@ -382,7 +353,7 @@ export async function action({ request }: ActionArgs) {
         await s3Client.send(new PutObjectCommand(docUploadParams));
         await updateDocVersion(id as string, doc?.name);
       }
-      return json({
+      return {
         success: {
           create: false,
           update: true,
@@ -392,10 +363,10 @@ export async function action({ request }: ActionArgs) {
           name: null,
           image: null,
         },
-      });
+      };
     }
   }
-  return json({
+  return {
     success: {
       create: false,
       update: false,
@@ -405,7 +376,7 @@ export async function action({ request }: ActionArgs) {
       name: null,
       image: null,
     },
-  });
+  };
 }
 
 export default function Admin() {

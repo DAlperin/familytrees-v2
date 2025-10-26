@@ -1,31 +1,26 @@
-import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
+import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "react-router";
+import { data } from "react-router";
 import {
   Links,
-  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "@remix-run/react";
+} from "react-router";
 
-import tailwindStylesheetUrl from "./styles/tailwind.css";
+import "./styles/tailwind.css";
 import { getUser } from "./session.server";
 
-export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
-};
+export const meta: MetaFunction = () => [
+  { charSet: "utf-8" },
+  { title: "Family Trees" },
+  { name: "viewport", content: "width=device-width,initial-scale=1" },
+];
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Family Trees",
-  viewport: "width=device-width,initial-scale=1",
-});
-
-export async function loader({ request }: LoaderArgs) {
-  return json({
+export async function loader({ request }: LoaderFunctionArgs) {
+  return {
     user: await getUser(request),
-  });
+  };
 }
 
 export default function App() {
@@ -39,7 +34,6 @@ export default function App() {
         <Outlet />
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
       </body>
     </html>
   );
